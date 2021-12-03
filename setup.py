@@ -49,15 +49,6 @@ class CMakeBuild(build_ext):
 
 
 setup(
-    name='gco',
-    version='1.0.0',
-    author='Angus Hollands',
-    author_email='goosey15@gmail.com',
-    description='GCO library with Python bindings',
-    long_description='',
     ext_modules=[CMakeExtension('gco.lib', 'src')],
-    install_requires=["cppyy"],
-    packages=['gco'],
     cmdclass=dict(build_ext=CMakeBuild),
-    zip_safe=False,
 )
