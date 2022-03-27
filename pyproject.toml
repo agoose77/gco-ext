@@ -1,4 +1,11 @@
-[tool.cibuildwheel]
+[build-system]
+requires = [
+    "setuptools>=42",
+    "wheel",
+    "scikit-build",
+    "cmake>=3.17",
+    "pybind11>=2.9.0",
+    "ninja; platform_system!='Windows'"
+]
 
-# Disable building PyPy wheels on all platforms
-skip = "pp*"
+build-backend = "setuptools.build_meta"
