@@ -34,8 +34,15 @@ pybind11_add_module(
 # Link against GCO
 target_link_libraries(gco_ext PRIVATE gco)
 
-# Ensure we can find the gco target at runtime
-set_target_properties(gco_ext PROPERTIES
-    INSTALL_RPATH "$ORIGIN/${CMAKE_INSTALL_LIBDIR}")
+# Platform specific options
+if(UNIX AND NOT APPLE)
+    # Ensure we can find the gco target at runtime
+    set_target_properties(gco_ext PROPERTIES
+        INSTALL_RPATH "$ORIGIN/${CMAKE_INSTALL_LIBDIR}")
+elseif(APPLE)
+    # Ensure we can find the gco target at runtime
+    set_target_properties(gco_ext PROPERTIES
+        INSTALL_RPATH "@loader_path/${CMAKE_INSTALL_LIBDIR}")
+endif()
 
 install(TARGETS gco_ext DESTINATION .)
