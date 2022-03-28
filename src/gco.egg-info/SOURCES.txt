@@ -11,7 +11,7 @@ _skbuild/linux-x86_64-3.9/cmake-install/src/gco/include/energy.h
 _skbuild/linux-x86_64-3.9/cmake-install/src/gco/include/graph.h
 _skbuild/linux-x86_64-3.9/cmake-install/src/gco/include/graph.inl
 _skbuild/linux-x86_64-3.9/cmake-install/src/gco/include/maxflow.inl
-_skbuild/linux-x86_64-3.9/cmake-install/src/gco/lib/libgco.so
+_skbuild/linux-x86_64-3.9/cmake-install/src/gco/lib/libgco.a
 _skbuild/linux-x86_64-3.9/cmake-install/src/gco/lib/cmake/GCO/GCOTargets-release.cmake
 _skbuild/linux-x86_64-3.9/cmake-install/src/gco/lib/cmake/GCO/GCOTargets.cmake
 src/gco.egg-info/PKG-INFO
