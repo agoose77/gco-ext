@@ -10,8 +10,6 @@ if (NOT SKBUILD)
                       "Please run\n$ pip install .")
 endif()
 
-include(GNUInstallDirs)
-
 
 # Scikit-Build does not add your site-packages to the search path
 # automatically, so we need to add it _or_ the pybind11 specific directory
