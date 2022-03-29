@@ -2,9 +2,6 @@ name: Build
 
 on:
   workflow_dispatch:
-    inputs:
-      overrideVersion:
-        description: Manually force a version
   pull_request:
     branches:
       - master
