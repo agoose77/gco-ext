@@ -5,6 +5,7 @@
 #include <pybind11/pybind11.h>
 
 namespace py = pybind11;
+using namespace pybind11::literals;
 using namespace GCO;
 
 using SiteID = GCoptimization::SiteID;
@@ -13,12 +14,13 @@ using EnergyValue = GCoptimization::EnergyTermType;
 
 PYBIND11_MODULE(gco_ext, m) {
   py::class_<GCoptimization>(m, "GCoptimization")
-      .def("expansion", &GCoptimization::expansion)
-      .def("alpha_expansion", &GCoptimization::alpha_expansion)
-      .def("swap", &GCoptimization::swap)
+      .def("expansion", &GCoptimization::expansion, "max_num_iterations"_a)
+      .def("alpha_expansion", &GCoptimization::alpha_expansion, "label"_a)
+      .def("swap", &GCoptimization::swap, "max_num_iterations"_a)
       .def("alpha_beta_swap",
            static_cast<void (GCoptimization::*)(LabelID, LabelID)>(
-               &GCoptimization::alpha_beta_swap))
+               &GCoptimization::alpha_beta_swap),
+           "alpha_label"_a, "beta_label"_a)
       .def_property_readonly("num_sites", &GCoptimization::numSites)
       .def_property_readonly("num_labels", &GCoptimization::numLabels)
       .def_property_readonly("label_energy", &GCoptimization::giveLabelEnergy)
@@ -30,14 +32,20 @@ PYBIND11_MODULE(gco_ext, m) {
       .def_property("random_label_order", &GCoptimization::randomLabelOrder,
                     static_cast<void (GCoptimization::*)(bool)>(
                         &GCoptimization::setLabelOrder))
-      .def("get_label", static_cast<LabelID (GCoptimization::*)(SiteID)>(
-                            &GCoptimization::whatLabel))
-      .def("set_label", static_cast<void (GCoptimization::*)(SiteID, LabelID)>(
-                            &GCoptimization::setLabel))
-      .def("set_label_order",
-           [](GCoptimization &graph,
-              py::array_t<LabelID, py::array::c_style | py::array::forcecast>
-                  order) { graph.setLabelOrder(order.data(), order.size()); })
+      .def("get_label",
+           static_cast<LabelID (GCoptimization::*)(SiteID)>(
+               &GCoptimization::whatLabel),
+           "site"_a)
+      .def("set_label",
+           static_cast<void (GCoptimization::*)(SiteID, LabelID)>(
+               &GCoptimization::setLabel),
+           "site"_a, "label"_a)
+      .def(
+          "set_label_order",
+          [](GCoptimization &graph,
+             py::array_t<LabelID, py::array::c_style | py::array::forcecast>
+                 order) { graph.setLabelOrder(order.data(), order.size()); },
+          "order"_a)
       .def_property(
           "label",
           [](GCoptimization &g) {
@@ -58,13 +66,16 @@ PYBIND11_MODULE(gco_ext, m) {
                   "data size does not match graph size");
             }
             graph.setDataCost(data.mutable_data());
-          })
+          },
+          "cost"_a)
       .def("set_data_cost",
            static_cast<void (GCoptimization::*)(SiteID, LabelID, EnergyValue)>(
-               &GCoptimization::setDataCost))
+               &GCoptimization::setDataCost),
+           "site"_a, "label"_a, "cost"_a)
       .def("set_smooth_cost",
            static_cast<void (GCoptimization::*)(SiteID, LabelID, EnergyValue)>(
-               &GCoptimization::setSmoothCost))
+               &GCoptimization::setSmoothCost),
+           "site"_a, "label"_a, "cost"_a)
       .def(
           "set_smooth_cost",
           [](GCoptimization &graph,
@@ -75,9 +86,12 @@ PYBIND11_MODULE(gco_ext, m) {
                   "data size does not match graph size");
             }
             graph.setLabelCost(data.mutable_data());
-          })
-      .def("set_label_cost", static_cast<void (GCoptimization::*)(EnergyValue)>(
-                                 &GCoptimization::setLabelCost))
+          },
+          "cost"_a)
+      .def("set_label_cost",
+           static_cast<void (GCoptimization::*)(EnergyValue)>(
+               &GCoptimization::setLabelCost),
+           "cost"_a)
       .def(
           "set_label_cost",
           [](GCoptimization &graph,
@@ -88,17 +102,21 @@ PYBIND11_MODULE(gco_ext, m) {
                   "data size does not match graph size");
             }
             graph.setLabelCost(data.mutable_data());
-          })
-      .def("set_label_cost",
-           [](GCoptimization &graph,
-              py::array_t<LabelID, py::array::c_style | py::array::forcecast>
-                  label,
-              EnergyValue cost) {
-             graph.setLabelSubsetCost(label.mutable_data(), label.size(), cost);
-           });
+          },
+          "cost"_a)
+      .def(
+          "set_label_cost",
+          [](GCoptimization &graph,
+             py::array_t<LabelID, py::array::c_style | py::array::forcecast>
+                 label,
+             EnergyValue cost) {
+            graph.setLabelSubsetCost(label.mutable_data(), label.size(), cost);
+          },
+          "label"_a, "cost"_a);
   py::class_<GCoptimizationGridGraph, GCoptimization>(m,
                                                       "GCoptimizationGridGraph")
-      .def(py::init<SiteID, SiteID, LabelID>())
+      .def(py::init<SiteID, SiteID, LabelID>(), "width"_a, "height"_a,
+           "num_labels"_a)
       .def(
           "setSmoothCostVH",
           [](GCoptimizationGridGraph &graph,
@@ -117,10 +135,11 @@ PYBIND11_MODULE(gco_ext, m) {
             graph.setSmoothCostVH(smooth.mutable_data(),
                                   vertical_cost.mutable_data(),
                                   horizontal_cost.mutable_data());
-          });
+          },
+          "smooth_cost"_a, "vertical_cost"_a, "horizontal_cost"_a);
   py::class_<GCoptimizationGeneralGraph, GCoptimization>(
       m, "GCoptimizationGeneralGraph")
-      .def(py::init<SiteID, LabelID>())
+      .def(py::init<SiteID, LabelID>(), "num_sites"_a, "num_labels"_a)
       .def(
           "set_neighbors",
           [](GCoptimizationGeneralGraph &g,
@@ -143,6 +162,8 @@ PYBIND11_MODULE(gco_ext, m) {
             for (auto i = 0; i < site_1.size(); i++) {
               g.setNeighbors(site_1_data[i], site_2_data[i], weight_data[i]);
             }
-          })
-      .def("set_neighbors", &GCoptimizationGeneralGraph::setNeighbors);
+          },
+          "site_1"_a, "site_2"_a, "weight"_a)
+      .def("set_neighbors", &GCoptimizationGeneralGraph::setNeighbors,
+           "site_1"_a, "site_2"_a, "weight"_a);
 }
