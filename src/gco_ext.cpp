@@ -39,7 +39,7 @@ PYBIND11_MODULE(gco_ext, m) {
            py::keep_alive<1, 2>(), py::keep_alive<1, 3>(),
            py::keep_alive<1, 4>());
 
-  py::class_<GCoptimization>(m, "GCoptimization")
+  py::class_<GCoptimization>(m, "GCOBase")
       .def("expansion", &GCoptimization::expansion, "max_num_iterations"_a)
       .def("alpha_expansion", &GCoptimization::alpha_expansion, "label"_a)
       .def("swap", &GCoptimization::swap, "max_num_iterations"_a)
@@ -139,8 +139,7 @@ PYBIND11_MODULE(gco_ext, m) {
             graph.setLabelSubsetCost(label.mutable_data(), label.size(), cost);
           },
           "label"_a, "cost"_a);
-  py::class_<GCoptimizationGridGraph, GCoptimization>(m,
-                                                      "GCoptimizationGridGraph")
+  py::class_<GCoptimizationGridGraph, GCoptimization>(m, "GCOGridGraph")
       .def(py::init<SiteID, SiteID, LabelID>(), "width"_a, "height"_a,
            "num_labels"_a)
       .def(
