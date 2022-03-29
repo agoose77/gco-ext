@@ -69,8 +69,9 @@ PYBIND11_MODULE(gco_ext, m) {
       .def(
           "set_label_order",
           [](GCoptimization &graph,
-             py::array_t<LabelID, py::array::c_style | py::array::forcecast>
-                 order) { graph.setLabelOrder(order.data(), order.size()); },
+             py::array_t<LabelID, py::array::c_style> order) {
+            graph.setLabelOrder(order.data(), order.size());
+          },
           "order"_a)
       .def_property(
           "label",
@@ -79,14 +80,13 @@ PYBIND11_MODULE(gco_ext, m) {
             g.whatLabel(0, result.size(), result.mutable_data());
             return result;
           },
-          [](GCoptimization &g,
-             py::array_t<SiteID, py::array::c_style | py::array::forcecast>
-                 label) { g.whatLabel(0, label.size(), label.mutable_data()); })
+          [](GCoptimization &g, py::array_t<SiteID, py::array::c_style> label) {
+            g.whatLabel(0, label.size(), label.mutable_data());
+          })
       .def(
           "set_data_cost",
           [](GCoptimization &graph,
-             py::array_t<EnergyValue, py::array::c_style | py::array::forcecast>
-                 data) {
+             py::array_t<EnergyValue, py::array::c_style> data) {
             if (data.size() != graph.numSites() * graph.numLabels()) {
               throw std::invalid_argument(
                   "data size does not match graph size");
@@ -99,14 +99,13 @@ PYBIND11_MODULE(gco_ext, m) {
                &GCoptimization::setDataCost),
            "site"_a, "label"_a, "cost"_a)
       .def("set_smooth_cost",
-           static_cast<void (GCoptimization::*)(SiteID, LabelID, EnergyValue)>(
+           static_cast<void (GCoptimization::*)(LabelID, LabelID, EnergyValue)>(
                &GCoptimization::setSmoothCost),
-           "site"_a, "label"_a, "cost"_a)
+           "site_1"_a, "site_2"_a, "cost"_a)
       .def(
           "set_smooth_cost",
           [](GCoptimization &graph,
-             py::array_t<EnergyValue, py::array::c_style | py::array::forcecast>
-                 data) {
+             py::array_t<EnergyValue, py::array::c_style> data) {
             if (data.size() != graph.numLabels() * graph.numLabels()) {
               throw std::invalid_argument(
                   "data size does not match graph size");
@@ -121,8 +120,7 @@ PYBIND11_MODULE(gco_ext, m) {
       .def(
           "set_label_cost",
           [](GCoptimization &graph,
-             py::array_t<EnergyValue, py::array::c_style | py::array::forcecast>
-                 data) {
+             py::array_t<EnergyValue, py::array::c_style> data) {
             if (data.size() != graph.numLabels()) {
               throw std::invalid_argument(
                   "data size does not match graph size");
@@ -133,9 +131,7 @@ PYBIND11_MODULE(gco_ext, m) {
       .def(
           "set_label_cost",
           [](GCoptimization &graph,
-             py::array_t<LabelID, py::array::c_style | py::array::forcecast>
-                 label,
-             EnergyValue cost) {
+             py::array_t<LabelID, py::array::c_style> label, EnergyValue cost) {
             graph.setLabelSubsetCost(label.mutable_data(), label.size(), cost);
           },
           "label"_a, "cost"_a);
@@ -143,14 +139,11 @@ PYBIND11_MODULE(gco_ext, m) {
       .def(py::init<SiteID, SiteID, LabelID>(), "width"_a, "height"_a,
            "num_labels"_a)
       .def(
-          "setSmoothCostVH",
+          "set_smooth_cost",
           [](GCoptimizationGridGraph &graph,
-             py::array_t<EnergyValue, py::array::c_style | py::array::forcecast>
-                 smooth,
-             py::array_t<EnergyValue, py::array::c_style | py::array::forcecast>
-                 vertical_cost,
-             py::array_t<EnergyValue, py::array::c_style | py::array::forcecast>
-                 horizontal_cost) {
+             py::array_t<EnergyValue, py::array::c_style> smooth,
+             py::array_t<EnergyValue, py::array::c_style> vertical_cost,
+             py::array_t<EnergyValue, py::array::c_style> horizontal_cost) {
             if (vertical_cost.size() != graph.numSites() ||
                 horizontal_cost.size() != graph.numSites() ||
                 smooth.size() != graph.numLabels() * graph.numLabels()) {
