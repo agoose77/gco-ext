@@ -16,5 +16,6 @@ ignore = [
     "*.in",
     "README.txt",
     "requirements-dev.txt",
-    "**/.ipynb_checkpoints/**"
+    "tests/**",
+    "literary_config.json"
 ]

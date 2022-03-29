@@ -1,5 +1,4 @@
 graft src
-graft tests
 
 # Extern
 graft extern/gco/include
@@ -14,4 +13,4 @@ global-exclude .ipynb_checkpoints
 global-exclude *.py[co]
 global-exclude __pycache__
 
-include CMakeLists.txt pyproject.toml setup.py setup.cfg README.md literary_config.json
+include CMakeLists.txt pyproject.toml setup.py setup.cfg README.md
