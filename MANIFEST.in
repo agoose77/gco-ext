@@ -1,0 +1,16 @@
+graft src
+
+# Extern
+graft extern/gco/include
+graft extern/gco/src
+include extern/gco/CMakeLists.txt
+include extern/gco/LICENSE
+
+global-exclude .git*
+global-exclude .pytest_cache
+global-exclude .DS_Store
+global-exclude .ipynb_checkpoints
+global-exclude *.py[co]
+global-exclude __pycache__
+
+include CMakeLists.txt pyproject.toml setup.py setup.cfg README.md
