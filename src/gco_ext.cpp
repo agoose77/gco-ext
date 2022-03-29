@@ -12,6 +12,51 @@ using SiteID = GCoptimization::SiteID;
 using LabelID = GCoptimization::LabelID;
 using EnergyValue = GCoptimization::EnergyTermType;
 
+// Helper class for jagged neighborhoods
+class GCONeighborhood {
+public:
+  GCONeighborhood(SiteID num_sites, SiteID count[], SiteID site[],
+                  EnergyValue weight[])
+      : m_numSites{num_sites} {
+    m_numNeighborsTotal = 0;
+    m_numNeighbors = (SiteID *)count;
+
+    m_neighborsIndexes = new SiteID *[m_numSites];
+    m_neighborsWeights = new EnergyValue *[m_numSites];
+
+    for (int i = 0; i < m_numSites; i++) {
+      auto count_i = count[i];
+
+      m_neighborsIndexes[i] = (SiteID *)site + m_numNeighborsTotal;
+      m_neighborsWeights[i] = (EnergyValue *)weight + m_numNeighborsTotal;
+
+      m_numNeighborsTotal += count_i;
+    }
+  }
+  virtual ~GCONeighborhood() {
+    // We don't own the pointers within these arrays
+    // only delete the outer array
+    delete[] m_neighborsIndexes;
+    delete[] m_neighborsWeights;
+  }
+
+  SiteID *numNeighbors() const { return m_numNeighbors; }
+
+  EnergyValue **neighborsWeights() const { return m_neighborsWeights; }
+
+  SiteID **neighborsIndexes() const { return m_neighborsIndexes; }
+
+  SiteID numSites() const { return m_numSites; }
+
+private:
+  SiteID **m_neighborsIndexes;
+  EnergyValue **m_neighborsWeights;
+  SiteID *m_numNeighbors; // holds num of neighbors for each site
+
+  SiteID m_numNeighborsTotal; // holds total num of neighbor relationships
+  SiteID m_numSites;          // number of sites
+};
+
 PYBIND11_MODULE(gco_ext, m) {
   static py::exception<GCException> exc(m, "GCException");
   py::register_exception_translator([](std::exception_ptr p) {
@@ -155,33 +200,25 @@ PYBIND11_MODULE(gco_ext, m) {
                                   horizontal_cost.mutable_data());
           },
           "smooth_cost"_a, "vertical_cost"_a, "horizontal_cost"_a);
-  py::class_<GCoptimizationGeneralGraph, GCoptimization>(
-      m, "GCoptimizationGeneralGraph")
+  py::class_<GCoptimizationGeneralGraph, GCoptimization>(m, "GCOGeneralGraph")
       .def(py::init<SiteID, LabelID>(), "num_sites"_a, "num_labels"_a)
+      .def("set_neighbors",
+           static_cast<void (GCoptimizationGeneralGraph::*)(SiteID, SiteID,
+                                                            EnergyValue)>(
+               &GCoptimizationGeneralGraph::setNeighbors),
+           "site_1"_a, "site_2"_a, "weight"_a)
       .def(
           "set_neighbors",
-          [](GCoptimizationGeneralGraph &g,
-             py::array_t<SiteID, py::array::c_style | py::array::forcecast>
-                 site_1,
-             py::array_t<SiteID, py::array::c_style | py::array::forcecast>
-                 site_2,
-             py::array_t<EnergyValue, py::array::c_style | py::array::forcecast>
-                 weight) {
-            if (site_1.ndim() != 1 || site_2.ndim() != 1 || weight.ndim() != 1)
-              throw std::runtime_error("Incompatible buffer dimension!");
-
-            if (site_1.size() != site_2.size() ||
-                site_2.size() != weight.size())
-              throw std::runtime_error("Incompatible buffer size!");
-
-            auto site_1_data = site_1.unchecked<1>();
-            auto site_2_data = site_2.unchecked<1>();
-            auto weight_data = weight.unchecked<1>();
-            for (auto i = 0; i < site_1.size(); i++) {
-              g.setNeighbors(site_1_data[i], site_2_data[i], weight_data[i]);
+          [](GCoptimizationGeneralGraph &graph,
+             const GCONeighborhood &neighborhood) {
+            if (neighborhood.numSites() != graph.numSites()) {
+              throw std::invalid_argument(
+                  "neighborhood size does not match graph size");
             }
+
+            graph.setAllNeighbors(neighborhood.numNeighbors(),
+                                  neighborhood.neighborsIndexes(),
+                                  neighborhood.neighborsWeights());
           },
-          "site_1"_a, "site_2"_a, "weight"_a)
-      .def("set_neighbors", &GCoptimizationGeneralGraph::setNeighbors,
-           "site_1"_a, "site_2"_a, "weight"_a);
+          "neighborhood"_a);
 }
