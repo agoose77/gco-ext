@@ -13,6 +13,32 @@ using LabelID = GCoptimization::LabelID;
 using EnergyValue = GCoptimization::EnergyTermType;
 
 PYBIND11_MODULE(gco_ext, m) {
+  static py::exception<GCException> exc(m, "GCException");
+  py::register_exception_translator([](std::exception_ptr p) {
+    try {
+      if (p)
+        std::rethrow_exception(p);
+    } catch (const GCException &e) {
+      exc(e.message);
+    }
+  });
+
+  py::class_<GCONeighborhood>(m, "GCONeighborhood")
+      .def(py::init([](py::array_t<SiteID, py::array::c_style> count,
+                       py::array_t<SiteID, py::array::c_style> site,
+                       py::array_t<EnergyValue, py::array::c_style> weight) {
+             if (site.ndim() != 1 || weight.ndim() != 1 || count.ndim() != 1 ||
+                 site.size() != weight.size()) {
+               throw std::invalid_argument(
+                   "data size does not match graph size");
+             }
+             return std::unique_ptr<GCONeighborhood>(new GCONeighborhood(
+                 count.size(), count.mutable_data(), site.mutable_data(),
+                 weight.mutable_data()));
+           }),
+           py::keep_alive<1, 2>(), py::keep_alive<1, 3>(),
+           py::keep_alive<1, 4>());
+
   py::class_<GCoptimization>(m, "GCoptimization")
       .def("expansion", &GCoptimization::expansion, "max_num_iterations"_a)
       .def("alpha_expansion", &GCoptimization::alpha_expansion, "label"_a)
