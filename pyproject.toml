@@ -14,5 +14,7 @@ build-backend = "setuptools.build_meta"
 ignore = [
     ".pre-commit-config.yaml",
     "*.in",
-    "README.txt"
+    "README.txt",
+    "requirements-dev.txt",
+    "**/.ipynb_checkpoints/**"
 ]

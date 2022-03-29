@@ -1,0 +1,8 @@
+{
+  "PackageBuilder": {
+    "clear_generated": true
+  },
+  "IPythonTransformer": {
+    "error_if_ipython": false
+  }
+}

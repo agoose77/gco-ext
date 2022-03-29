@@ -1,0 +1,4 @@
+pytest 
+oldest-supported-numpy
+scipy
+matplotlib
