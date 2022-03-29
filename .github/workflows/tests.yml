@@ -28,7 +28,7 @@ jobs:
         python-version: ${{ matrix.python-version }}
 
     - name: Install python tools
-      run: python -m pip install literary nbclient oldest-supported-numpy scipy matplotlib
+      run: python -m pip install literary ipykernel nbclient oldest-supported-numpy scipy matplotlib
 
     - name: Build
       run: python -m pip install .
