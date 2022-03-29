@@ -118,16 +118,13 @@ PYBIND11_MODULE(gco_ext, m) {
             graph.setLabelOrder(order.data(), order.size());
           },
           "order"_a)
-      .def_property(
-          "label",
-          [](GCoptimization &g) {
-            py::array_t<SiteID> result{g.numSites()};
-            g.whatLabel(0, result.size(), result.mutable_data());
-            return result;
-          },
-          [](GCoptimization &g, py::array_t<SiteID, py::array::c_style> label) {
-            g.whatLabel(0, label.size(), label.mutable_data());
-          })
+      .def_property_readonly("label",
+                             [](GCoptimization &g) {
+                               py::array_t<SiteID> result{g.numSites()};
+                               g.whatLabel(0, result.size(),
+                                           result.mutable_data());
+                               return result;
+                             })
       .def(
           "set_data_cost",
           [](GCoptimization &graph,
