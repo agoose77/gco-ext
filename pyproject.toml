@@ -9,3 +9,10 @@ requires = [
 ]
 
 build-backend = "setuptools.build_meta"
+
+[tool.check-manifest]
+ignore = [
+    ".pre-commit-config.yaml",
+    "*.in",
+    "README.txt"
+]
