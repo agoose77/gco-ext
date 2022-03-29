@@ -61,7 +61,7 @@ PYBIND11_MODULE(gco_ext, m) {
           [](GCoptimization &graph,
              py::array_t<EnergyValue, py::array::c_style | py::array::forcecast>
                  data) {
-            if (data.size() != graph.numSites()) {
+            if (data.size() != graph.numSites() * graph.numLabels()) {
               throw std::invalid_argument(
                   "data size does not match graph size");
             }
@@ -81,11 +81,11 @@ PYBIND11_MODULE(gco_ext, m) {
           [](GCoptimization &graph,
              py::array_t<EnergyValue, py::array::c_style | py::array::forcecast>
                  data) {
-            if (data.size() != graph.numLabels()) {
+            if (data.size() != graph.numLabels() * graph.numLabels()) {
               throw std::invalid_argument(
                   "data size does not match graph size");
             }
-            graph.setLabelCost(data.mutable_data());
+            graph.setSmoothCost(data.mutable_data());
           },
           "cost"_a)
       .def("set_label_cost",
