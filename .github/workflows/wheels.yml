@@ -47,7 +47,7 @@ jobs:
           submodules: recursive
 
       - name: Build wheels
-        uses: pypa/cibuildwheel@2.5.0
+        uses: pypa/cibuildwheel@2.7.0
         # to supply options, put them in 'env', like:
         # env:
         #   CIBW_SOME_OPTION: value
