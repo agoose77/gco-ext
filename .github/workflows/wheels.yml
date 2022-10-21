@@ -34,7 +34,7 @@ jobs:
     - name: Check metadata
       run: pipx run twine check --strict dist/*
 
-    - uses: actions/upload-artifact@v2
+    - uses: actions/upload-artifact@v3
       with:
         path: dist/*.tar.gz
         
@@ -56,7 +56,7 @@ jobs:
         # env:
         #   CIBW_SOME_OPTION: value
 
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           path: ./wheelhouse/*.whl
           
