@@ -27,8 +27,8 @@ public:
     for (int i = 0; i < m_numSites; i++) {
       auto count_i = count[i];
 
-      m_neighborsIndexes[i] = (SiteID *)site + m_numNeighborsTotal;
-      m_neighborsWeights[i] = (EnergyValue *)weight + m_numNeighborsTotal;
+      m_neighborsIndexes[i] = site + m_numNeighborsTotal;
+      m_neighborsWeights[i] = weight + m_numNeighborsTotal;
 
       m_numNeighborsTotal += count_i;
     }
@@ -77,9 +77,9 @@ PYBIND11_MODULE(gco_ext, m) {
                throw std::invalid_argument(
                    "data size does not match graph size");
              }
-             return std::unique_ptr<GCONeighborhood>(new GCONeighborhood(
+             return std::make_unique<GCONeighborhood>(
                  count.size(), count.mutable_data(), site.mutable_data(),
-                 weight.mutable_data()));
+                 weight.mutable_data());
            }),
            py::keep_alive<1, 2>(), py::keep_alive<1, 3>(),
            py::keep_alive<1, 4>());
@@ -135,7 +135,7 @@ PYBIND11_MODULE(gco_ext, m) {
             }
             graph.setDataCost(data.mutable_data());
           },
-          "cost"_a)
+          "cost"_a, py::keep_alive<1, 2>())
       .def("set_data_cost",
            static_cast<void (GCoptimization::*)(SiteID, LabelID, EnergyValue)>(
                &GCoptimization::setDataCost),
@@ -154,7 +154,7 @@ PYBIND11_MODULE(gco_ext, m) {
             }
             graph.setSmoothCost(data.mutable_data());
           },
-          "cost"_a)
+          "cost"_a, py::keep_alive<1, 2>())
       .def("set_label_cost",
            static_cast<void (GCoptimization::*)(EnergyValue)>(
                &GCoptimization::setLabelCost),
@@ -196,7 +196,7 @@ PYBIND11_MODULE(gco_ext, m) {
                                   vertical_cost.mutable_data(),
                                   horizontal_cost.mutable_data());
           },
-          "smooth_cost"_a, "vertical_cost"_a, "horizontal_cost"_a);
+          "smooth_cost"_a, "vertical_cost"_a, "horizontal_cost"_a, py::keep_alive<1, 2>());
   py::class_<GCoptimizationGeneralGraph, GCoptimization>(m, "GCOGeneralGraph")
       .def(py::init<SiteID, LabelID>(), "num_sites"_a, "num_labels"_a)
       .def("set_neighbors",
@@ -217,5 +217,5 @@ PYBIND11_MODULE(gco_ext, m) {
                                   neighborhood.neighborsIndexes(),
                                   neighborhood.neighborsWeights());
           },
-          "neighborhood"_a);
+          "neighborhood"_a, py::keep_alive<1, 2>());
 }
