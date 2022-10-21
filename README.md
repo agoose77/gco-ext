@@ -1,5 +1,10 @@
 # gco
-[![Tests](https://github.com/agoose77/gco-ext/actions/workflows/tests.yml/badge.svg)](https://github.com/agoose77/gco-ext/actions/workflows/tests.yml)
+[![tests-badge][]][tests] [![pypi-badge][]][pypi]
+
+[tests-badge]: https://github.com/agoose77/gco-ext/actions/workflows/tests.yml/badge.svg
+[tests]: https://github.com/agoose77/gco-ext/actions/workflows/tests.yml
+[pypi-badge]: https://img.shields.io/pypi/v/gco
+[pypi]: https://pypi.org/project/gco
 
 A Python interface to the [gco](https://github.com/agoose77/gco-v3.0) library (modified for repackaging from [the original source](https://vision.cs.uwaterloo.ca/code/))
 
