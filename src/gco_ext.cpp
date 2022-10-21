@@ -77,7 +77,7 @@ PYBIND11_MODULE(gco_ext, m) {
                throw std::invalid_argument(
                    "data size does not match graph size");
              }
-             return std::unique_ptr<GCONeighborhood>(new GCONeighborhood()
+             return std::unique_ptr<GCONeighborhood>(new GCONeighborhood(
                  count.size(), count.mutable_data(), site.mutable_data(),
                  weight.mutable_data()));
            }),
